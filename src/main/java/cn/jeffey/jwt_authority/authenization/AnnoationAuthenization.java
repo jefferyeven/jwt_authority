@@ -29,7 +29,6 @@ public class AnnoationAuthenization extends AbstractAuthenization {
                 return doAuthenizate(request,response,url, annoationPermissionUrl.getPostMap(), annoationPermissionUrl.getRequestMap());
             default:
                 return doAuthenizate(request,response,url,  annoationPermissionUrl.getRequestMap(),null);
-
         }
 
     }
@@ -38,11 +37,35 @@ public class AnnoationAuthenization extends AbstractAuthenization {
             UrlPermission urlPermission = map.get(url);
             AuthentizationStrategy authentizationStrategy = urlPermission.getAuthenizationStrategy();
             boolean passAuthizate = authentizationStrategy.passAuthentization(request,response,urlPermission);
-            if(nextMap == null||passAuthizate){
-                return passAuthizate?AuthenizationState.PassState:AuthenizationState.NoPassState;
-            }
+            return passAuthizate?AuthenizationState.PassState:AuthenizationState.NoPassState;
+        }
+        if(nextMap!=null) {
             return doAuthenizate(request,response,url,nextMap,null);
         }
-        return AuthenizationState.UnAuthenizateState;
+        // 代表是reques,由于其可以是加在类上。
+        String findUrl = findMathUrl(url,map);
+        // 没有发现匹配的url
+        if (noMatch.equals(findUrl)) {
+            return AuthenizationState.UnAuthenizateState;
+        }
+        UrlPermission urlPermission = map.get(findUrl);
+        AuthentizationStrategy authentizationStrategy = urlPermission.getAuthenizationStrategy();
+        boolean passAuthizate = authentizationStrategy.passAuthentization(request,response,urlPermission);
+        return passAuthizate?AuthenizationState.PassState:AuthenizationState.NoPassState;
+    }
+    private final String noMatch = "don't find match url";
+    private String findMathUrl(String url,Map<String, UrlPermission> map) {
+        String[] mathes = url.split("/");
+        for (int i = mathes.length - 1; i >= 0; i--) {
+            StringBuilder res = new StringBuilder();
+            for (int j = 0; j < i; j++) {
+                res.append(mathes[j]).append("/");
+            }
+            res.append("*");
+            if (map.containsKey(res.toString())) {
+                return res.toString();
+            }
+        }
+        return noMatch;
     }
 }

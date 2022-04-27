@@ -10,14 +10,17 @@ public class AuthenizationConfig {
     private final PriorityQueue<AuthenizationOrder> authenizationOrders;
     private boolean useAnnoation;
     public AuthenizationConfig(){
-        authenizationOrders = new PriorityQueue<>((o1, o2) -> {
-            if(o1.getOrder()==null){
-                return 1;
+        authenizationOrders = new PriorityQueue<>(new Comparator<AuthenizationOrder>() {
+            @Override
+            public int compare(AuthenizationOrder o1, AuthenizationOrder o2) {
+                if(o1.getOrder()==null){
+                    return 1;
+                }
+                if(o2.getOrder()==null){
+                    return -1;
+                }
+                return o1.getOrder()-o2.getOrder();
             }
-            if(o2.getOrder()==null){
-                return -1;
-            }
-            return o1.getOrder()-o2.getOrder();
         });
     }
     public void setUseAnnoation(boolean useAnnoation) {

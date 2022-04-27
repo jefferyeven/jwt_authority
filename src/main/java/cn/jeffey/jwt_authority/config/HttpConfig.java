@@ -3,7 +3,6 @@ package cn.jeffey.jwt_authority.config;
 import cn.jeffey.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
 import cn.jeffey.jwt_authority.bean.UrlsPermission;
 import cn.jeffey.jwt_authority.utils.TokenUtil;
-import cn.jeffey.jwt_authority.utils.TokenVerifyer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,9 +63,5 @@ public class HttpConfig {
 
     public void setHeaderParameterTokenName(String headerParameterTokenName) {
         AuthenizationStrategyManger.setHeaderParameterTokenName(headerParameterTokenName);
-    }
-
-    public void setTokenVerifyer(TokenVerifyer tokenVerifyer){
-        AuthenizationStrategyManger.setStrategyTokenVerifyer(tokenVerifyer);
     }
 }

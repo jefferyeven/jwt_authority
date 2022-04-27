@@ -50,7 +50,17 @@ public class AnnoationHandler implements EmbeddedValueResolverAware {
             RequestMapping requestMapping = readClass.getAnnotation(RequestMapping.class);
             prePerifx = requestMapping.value();
             cleanMappingValues(prePerifx);
-
+            if(readClass.isAnnotationPresent(NeedAuthorize.class)){
+                NeedAuthorize needAuthorize = readClass.getAnnotation(NeedAuthorize.class);
+                Map<String, UrlPermission> map = annoationPermissionUrl.getGetMap();
+                PermissionLevel permissionLevel = needAuthorize.authorizeLevel();
+                List<String> authorities = Arrays.asList(needAuthorize.authorties());
+                AuthentizationStrategy strategy = AuthenizationStrategyManger.getAuthenizationByPermissionLevel(permissionLevel);
+                for(String url : prePerifx){
+                    url = url + "/*";
+                    map.put(url,new UrlPermission(url,authorities,permissionLevel,strategy));
+                }
+            }
         }
         Method[] methods = readClass.getMethods();
         for(Method method:methods){
