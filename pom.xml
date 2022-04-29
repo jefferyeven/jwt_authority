@@ -8,14 +8,16 @@
         <version>2.6.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>cn.jeffey</groupId>
+    <groupId>io.github.jefferyeven</groupId>
     <artifactId>jwt_authority</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>jwt_authority</name>
     <description>jwt_authority</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
+    <!--  中央仓库个人存储库的账号密码 -->
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,9 +58,90 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+<!--                    不打包依赖-->
+                    <includes>
+                        <!-- 设置没有jar包,需要的话就注释掉-->
+                        <include>
+                            <groupId>nothing</groupId>
+                            <artifactId>nothing</artifactId>
+                        </include>
+                    </includes>
                 </configuration>
+            </plugin>
+
+            <!-- java-doc配置 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration> <!-- add this to disable checking -->
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 使用source 进行jar打包-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+    <!-- mvn clean deploy  -->
+    <!-- 许可证 -->
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- 源码信息 -->
+    <scm>
+        <url>https://github.com/jefferyeven/jwt_authority</url>
+        <connection>scm:https://github.com/jefferyeven/jwt_authority.git</connection>
+        <developerConnection>scm:https://github.com/jefferyeven/jwt_authority.git</developerConnection>
+    </scm>
+
+    <!-- 个人信息,对应 gpg 配置 -->
+    <developers>
+        <developer>
+            <name>jeffery</name>
+            <email>1249336792@qq.com</email>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+
+    <!-- 中央仓库配置id 需对应 settings.xml 的 server的id -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
+
