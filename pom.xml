@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.github.jefferyeven</groupId>
     <artifactId>jwt_authority</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1-Release</version>
     <name>jwt_authority</name>
     <description>jwt_authority</description>
     <properties>
@@ -99,6 +99,20 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- GPG -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>

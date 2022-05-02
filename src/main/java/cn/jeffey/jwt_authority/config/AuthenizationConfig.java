@@ -2,25 +2,23 @@ package cn.jeffey.jwt_authority.config;
 
 import cn.jeffey.jwt_authority.authenization.AbstractAuthenization;
 import cn.jeffey.jwt_authority.authenization.AuthenizationOrder;
+import cn.jeffey.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
+import cn.jeffey.jwt_authority.utils.TokenVerifyer;
 
-import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class AuthenizationConfig {
     private final PriorityQueue<AuthenizationOrder> authenizationOrders;
     private boolean useAnnoation;
     public AuthenizationConfig(){
-        authenizationOrders = new PriorityQueue<>(new Comparator<AuthenizationOrder>() {
-            @Override
-            public int compare(AuthenizationOrder o1, AuthenizationOrder o2) {
-                if(o1.getOrder()==null){
-                    return 1;
-                }
-                if(o2.getOrder()==null){
-                    return -1;
-                }
-                return o1.getOrder()-o2.getOrder();
+        authenizationOrders = new PriorityQueue<>((o1, o2) -> {
+            if(o1.getOrder()==null){
+                return 1;
             }
+            if(o2.getOrder()==null){
+                return -1;
+            }
+            return o1.getOrder()-o2.getOrder();
         });
     }
     public void setUseAnnoation(boolean useAnnoation) {
@@ -28,6 +26,9 @@ public class AuthenizationConfig {
     }
     public boolean getUseAnnoation(){
         return useAnnoation;
+    }
+    public void setStrategyTokenVerifyer(TokenVerifyer tokenVerifyer){
+        AuthenizationStrategyManger.setStrategyTokenVerifyer(tokenVerifyer);
     }
     public void addAuthenization(AbstractAuthenization authenization,Integer order){
         authenizationOrders.add(new AuthenizationOrder(authenization,order));

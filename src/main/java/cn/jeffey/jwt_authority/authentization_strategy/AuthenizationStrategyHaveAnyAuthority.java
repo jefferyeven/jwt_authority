@@ -25,7 +25,7 @@ public class AuthenizationStrategyHaveAnyAuthority implements AuthentizationStra
         }
         VerifyTokenResult verifyTokenResult = tokenVerifyer.verifyToken(token);
         if(!verifyTokenResult.isPassVerify()){
-            throw new JwtSecurityException(JwtResponseMag.TokenReadError);
+            throw new JwtSecurityException(JwtResponseMag.TokenError);
         }
         List<String> authorities = verifyTokenResult.getAuthorities();
         List<String> needAuthorities = urlPermission.getAuthorities();

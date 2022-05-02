@@ -2,7 +2,6 @@ package cn.jeffey.jwt_authority.config;
 
 import cn.jeffey.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
 import cn.jeffey.jwt_authority.bean.UrlsPermission;
-import cn.jeffey.jwt_authority.utils.TokenUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +12,6 @@ public class HttpConfig {
     private final List<UrlsPermission> urlsPermissionList;
 
     public HttpConfig(){
-        AuthenizationStrategyManger.setStrategyTokenVerifyer(new TokenUtil());
         String headerParameterTokenName = "JwtToken";
         AuthenizationStrategyManger.setHeaderParameterTokenName(headerParameterTokenName);
         urlsPermissionList = new ArrayList<>();

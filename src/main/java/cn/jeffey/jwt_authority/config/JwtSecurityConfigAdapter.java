@@ -4,7 +4,10 @@ import cn.jeffey.jwt_authority.annoation.AnnoationHandler;
 import cn.jeffey.jwt_authority.authenization.AnnoationAuthenization;
 import cn.jeffey.jwt_authority.authenization.AuthenizationOrder;
 import cn.jeffey.jwt_authority.authenization.BasicAuthenization;
+import cn.jeffey.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
+import cn.jeffey.jwt_authority.bean.JwtSecurityTokenSetting;
 import cn.jeffey.jwt_authority.filter.JwtUrlsPermissionFilter;
+import cn.jeffey.jwt_authority.utils.JwtSecurityTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +19,8 @@ import javax.annotation.PostConstruct;
 public abstract class JwtSecurityConfigAdapter {
     private final HttpConfig httpConfig;
     private final AuthenizationConfig authenizationConfig;
-
+    @Autowired
+    private JwtSecurityTokenSetting jwtSecurityTokenSetting;
     public JwtSecurityConfigAdapter(){
        httpConfig = new HttpConfig();
        authenizationConfig = new AuthenizationConfig();
@@ -48,7 +52,13 @@ public abstract class JwtSecurityConfigAdapter {
         authenizationConfig.addAuthenization(new AuthenizationOrder(basicAuthenization, 1000));
     }
 
+    public HttpConfig getHttpConfig() {
+        return httpConfig;
+    }
 
+    public AuthenizationConfig getAuthenizationConfig() {
+        return authenizationConfig;
+    }
 
     @Bean
     public FilterRegistrationBean registrationBean() throws Exception {
@@ -63,6 +73,9 @@ public abstract class JwtSecurityConfigAdapter {
 
     @PostConstruct
     private void postConfig(){
+        JwtSecurityTokenUtil.updateJwtSecurityTokenUtil(jwtSecurityTokenSetting);
+        //设置默认的token verifyer
+        AuthenizationStrategyManger.setStrategyTokenVerifyer(new JwtSecurityTokenUtil());
         config(httpConfig);
         config(authenizationConfig);
     }
