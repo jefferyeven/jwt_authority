@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.github.jefferyeven</groupId>
     <artifactId>jwt_authority</artifactId>
-    <version>1.0.1-Release</version>
+    <version>1.0.2</version>
     <name>jwt_authority</name>
     <description>jwt_authority</description>
     <properties>
