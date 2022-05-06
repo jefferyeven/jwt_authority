@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.github.jefferyeven</groupId>
     <artifactId>jwt_authority</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>jwt_authority</name>
     <description>jwt_authority</description>
     <properties>
@@ -48,24 +48,13 @@
 
     <build>
         <plugins>
+            <!-- spring boot 项目复用需要添加的内容 -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-<!--                    不打包依赖-->
-                    <includes>
-                        <!-- 设置没有jar包,需要的话就注释掉-->
-                        <include>
-                            <groupId>nothing</groupId>
-                            <artifactId>nothing</artifactId>
-                        </include>
-                    </includes>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
 
