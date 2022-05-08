@@ -6,16 +6,17 @@ import io.github.jefferyeven.jwt_authority.authenization.AuthenizationOrder;
 import io.github.jefferyeven.jwt_authority.authenization.BasicAuthenization;
 import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
 import io.github.jefferyeven.jwt_authority.bean.JwtSecurityTokenSetting;
-import io.github.jefferyeven.jwt_authority.filter.JwtUrlsPermissionFilter;
 import io.github.jefferyeven.jwt_authority.utils.JwtSecurityTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.Order;
 
 import javax.annotation.PostConstruct;
 
 @Order(100)
+@ComponentScan(value = "io.github.jefferyeven.jwt_authority")
 public abstract class JwtSecurityConfigAdapter {
     private final HttpConfig httpConfig;
     private final AuthenizationConfig authenizationConfig;
@@ -65,7 +66,7 @@ public abstract class JwtSecurityConfigAdapter {
         // 设置验证filter
         initAuthenization();
         FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(new JwtUrlsPermissionFilter(authenizationConfig.startAuthenization()));
+        registration.setFilter(authenizationConfig.getJwtUrlsPermissionFilter());
         registration.addUrlPatterns("/*");
         registration.setName("JWTFilter");
         return registration;

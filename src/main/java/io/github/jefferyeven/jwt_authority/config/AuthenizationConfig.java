@@ -3,13 +3,17 @@ package io.github.jefferyeven.jwt_authority.config;
 import io.github.jefferyeven.jwt_authority.authenization.AbstractAuthenization;
 import io.github.jefferyeven.jwt_authority.authenization.AuthenizationOrder;
 import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
+import io.github.jefferyeven.jwt_authority.filter.JwtUrlsPermissionFailureHandler;
+import io.github.jefferyeven.jwt_authority.filter.JwtUrlsPermissionFilter;
 import io.github.jefferyeven.jwt_authority.utils.TokenVerifyer;
 
+import javax.servlet.Filter;
 import java.util.PriorityQueue;
 
 public class AuthenizationConfig {
     private final PriorityQueue<AuthenizationOrder> authenizationOrders;
     private boolean useAnnoation;
+    private JwtUrlsPermissionFilter jwtUrlsPermissionFilter = new JwtUrlsPermissionFilter();
     public AuthenizationConfig(){
         authenizationOrders = new PriorityQueue<>((o1, o2) -> {
             if(o1.getOrder()==null){
@@ -36,7 +40,8 @@ public class AuthenizationConfig {
     public void addAuthenization(AuthenizationOrder authenizationOrder){
         authenizationOrders.add(authenizationOrder);
     }
-    public AbstractAuthenization startAuthenization(){
+
+    public AbstractAuthenization getStartAuthenization(){
         AbstractAuthenization startAuthenization = authenizationOrders.poll().getAbstractAuthenization();
         AbstractAuthenization curAuthenization = startAuthenization;
         while (!authenizationOrders.isEmpty()){
@@ -47,4 +52,15 @@ public class AuthenizationConfig {
         return startAuthenization;
     }
 
+    public void setJwtUrlsPermissionFailureHandler(JwtUrlsPermissionFailureHandler failureHandler){
+        jwtUrlsPermissionFilter.setJwtUrlsPermissionFailureHandler(failureHandler);
+    }
+    public Filter getJwtUrlsPermissionFilter() {
+        jwtUrlsPermissionFilter.setStartAuthenization(getStartAuthenization());
+        return jwtUrlsPermissionFilter;
+    }
+
+    public void setJwtUrlsPermissionFilter(JwtUrlsPermissionFilter jwtUrlsPermissionFilter) {
+        this.jwtUrlsPermissionFilter = jwtUrlsPermissionFilter;
+    }
 }

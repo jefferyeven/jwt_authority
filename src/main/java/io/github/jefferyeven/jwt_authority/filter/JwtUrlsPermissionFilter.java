@@ -11,8 +11,32 @@ import java.io.IOException;
 
 public class JwtUrlsPermissionFilter implements Filter {
 
-    AbstractAuthenization startAuthenization;
-    public JwtUrlsPermissionFilter(AbstractAuthenization startAuthenization){
+   private AbstractAuthenization startAuthenization;
+    public JwtUrlsPermissionFilter(){
+
+    }
+
+    private JwtUrlsPermissionFailureHandler jwtUrlsPermissionFailureHandler = new JwtUrlsPermissionFailureHandler() {
+        @Override
+        public void commence(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException{
+            e.printStackTrace();
+            String res = "{/“code/”:500,/“msg/”," + e.getMessage() + "}";
+            response.getWriter().write(res);
+        }
+    };
+
+    public JwtUrlsPermissionFailureHandler getJwtUrlsPermissionFailureHandler() {
+        return jwtUrlsPermissionFailureHandler;
+    }
+
+    public void setJwtUrlsPermissionFailureHandler(JwtUrlsPermissionFailureHandler jwtUrlsPermissionFailureHandler) {
+        this.jwtUrlsPermissionFailureHandler = jwtUrlsPermissionFailureHandler;
+    }
+    public AbstractAuthenization getStartAuthenization() {
+        return startAuthenization;
+    }
+
+    public void setStartAuthenization(AbstractAuthenization startAuthenization) {
         this.startAuthenization = startAuthenization;
     }
 
@@ -24,22 +48,18 @@ public class JwtUrlsPermissionFilter implements Filter {
         try {
             passAuthenizate = startAuthenization.doAuthenizate(request,response);
         } catch (Exception e) {
-            throwExceptionUrl(servletRequest,servletResponse,e);
+            throwExceptionUrl(request,response,e);
             return;
         }
         if(!passAuthenizate){
-            throwExceptionUrl(servletRequest,servletResponse,new JwtSecurityException(JwtResponseMag.NoAuthorityError));
+            throwExceptionUrl(request,response,new JwtSecurityException(JwtResponseMag.NoAuthorityError));
             return;
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
-    private void throwExceptionUrl(ServletRequest servletRequest, ServletResponse servletResponse,Exception e) throws ServletException, IOException {
-        e.printStackTrace();
-        // 异常捕获、发送到UnsupportedJwtException
-        servletRequest.setAttribute("Exception", e);
-        // 将异常分发到UnsupportedJwtException控制器
-        servletRequest.getRequestDispatcher("/Exception").forward(servletRequest, servletResponse);
+    private void throwExceptionUrl(HttpServletRequest request, HttpServletResponse response,Exception e) throws ServletException, IOException {
+        jwtUrlsPermissionFailureHandler.commence(request,response,e);
     }
 
 
