@@ -20,7 +20,8 @@ public class JwtUrlsPermissionFilter implements Filter {
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException{
             e.printStackTrace();
-            String res = "{/“code/”:500,/“msg/”," + e.getMessage() + "}";
+            response.setContentType("text/plain;charset=UTF-8");
+            String res = "{\"code\":500,\"msg\",\""+e.getMessage()+"\"}";
             response.getWriter().write(res);
         }
     };
