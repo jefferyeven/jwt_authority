@@ -21,12 +21,9 @@ public class AuthenizationStrategyHaveAllAuthority implements AuthentizationStra
     }
 
     @Override
-    public boolean passAuthentization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission){
-        String token = request.getHeader(AuthenizationStrategyManger.getHeaderParameterTokenName());
-        if(token==null){
-            throw new JwtSecurityException(JwtResponseMag.NoTokenError);
-        }
-        VerifyTokenResult verifyTokenResult = tokenVerifyer.verifyToken(token);
+    public boolean passAuthentization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission) throws Exception {
+
+        VerifyTokenResult verifyTokenResult = tokenVerifyer.verifyToken(request,response);
         if(!verifyTokenResult.isPassVerify()){
             throw new JwtSecurityException(JwtResponseMag.TokenReadError);
         }

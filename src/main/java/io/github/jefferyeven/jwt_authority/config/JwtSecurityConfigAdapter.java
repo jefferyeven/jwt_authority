@@ -23,8 +23,8 @@ public abstract class JwtSecurityConfigAdapter {
     @Autowired
     private JwtSecurityTokenSetting jwtSecurityTokenSetting;
     public JwtSecurityConfigAdapter(){
-       httpConfig = new HttpConfig();
        authenizationConfig = new AuthenizationConfig();
+        httpConfig = new HttpConfig();
     }
 
     /**
@@ -77,8 +77,13 @@ public abstract class JwtSecurityConfigAdapter {
         JwtSecurityTokenUtil.updateJwtSecurityTokenUtil(jwtSecurityTokenSetting);
         //设置默认的token verifyer
         AuthenizationStrategyManger.setStrategyTokenVerifyer(new JwtSecurityTokenUtil());
-        config(httpConfig);
+        // 先构建认证的相关配置
         config(authenizationConfig);
+        // 根据验证规则初始化
+        httpConfig.initConfig();
+        // 再构建需要认证的url
+        config(httpConfig);
+
     }
 
 }

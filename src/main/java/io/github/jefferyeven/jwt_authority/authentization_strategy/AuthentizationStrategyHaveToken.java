@@ -12,17 +12,14 @@ public class AuthentizationStrategyHaveToken implements AuthentizationStrategy{
     private final TokenVerifyer tokenVerifyer;
 
     public AuthentizationStrategyHaveToken(TokenVerifyer tokenVerifyer) {
+        System.out.println(tokenVerifyer);
         this.tokenVerifyer = tokenVerifyer;
     }
 
     @Override
-    public boolean passAuthentization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission) {
-
-        String token = request.getHeader(AuthenizationStrategyManger.getHeaderParameterTokenName());
-        if(token==null){
-            throw new JwtSecurityException(JwtResponseMag.NoTokenError);
-        }
-        boolean res = tokenVerifyer.verifyToken(token).isPassVerify();
+    public boolean passAuthentization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission) throws Exception {
+        System.out.println(tokenVerifyer);
+        boolean res = tokenVerifyer.verifyToken(request,response).isPassVerify();
         if(!res){
             throw new JwtSecurityException(JwtResponseMag.TokenError);
         }

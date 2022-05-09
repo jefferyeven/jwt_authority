@@ -7,5 +7,5 @@ import javax.servlet.http.HttpServletResponse;
 
 
 public interface AuthentizationStrategy {
-    boolean passAuthentization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission)throws Exception;
+    boolean passAuthentization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission) throws Exception;
 }

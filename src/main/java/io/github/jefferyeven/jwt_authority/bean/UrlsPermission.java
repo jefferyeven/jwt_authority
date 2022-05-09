@@ -18,7 +18,6 @@ public class UrlsPermission {
         urls = new ArrayList<>();
         authorities = new ArrayList<>();
         anonymous();
-        authenizationStrategy = AuthenizationStrategyManger.getAuthentizationStrategyHaveToken();
 
     }
     public UrlsPermission(Collection<String> urls){
@@ -29,6 +28,8 @@ public class UrlsPermission {
 
     public void anonymous(){
         this.permissionLevel = PermissionLevel.HAVE_TOKEN;
+        System.out.println(AuthenizationStrategyManger.getStrategyTokenVerifyer());
+        setAuthenizationStrategy(AuthenizationStrategyManger.getAuthentizationStrategyHaveToken());
     }
 
     public void permitAll(){

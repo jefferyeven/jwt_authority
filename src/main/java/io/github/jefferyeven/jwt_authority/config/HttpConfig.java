@@ -12,14 +12,14 @@ public class HttpConfig {
     private final List<UrlsPermission> urlsPermissionList;
 
     public HttpConfig(){
-        String headerParameterTokenName = "JwtToken";
-        AuthenizationStrategyManger.setHeaderParameterTokenName(headerParameterTokenName);
         urlsPermissionList = new ArrayList<>();
+    }
+    public void initConfig(){
+        System.out.println(AuthenizationStrategyManger.getStrategyTokenVerifyer());
         defaultUrlConfig = addConfigUrlsPermission("/*");
         defaultUrlConfig.haveToken();
         urlsPermissionList.add(defaultUrlConfig);
     }
-
 
     /**
      * 得到所有权限列表
@@ -54,7 +54,7 @@ public class HttpConfig {
         urlsPermissionList.add(urlsPermission);
         return urlsPermission;
     }
-    private final UrlsPermission defaultUrlConfig;
+    private UrlsPermission defaultUrlConfig;
     public UrlsPermission getDefaultUrlConfig(){
         return defaultUrlConfig;
     }

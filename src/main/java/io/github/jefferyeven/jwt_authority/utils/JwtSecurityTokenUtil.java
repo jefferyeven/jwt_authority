@@ -8,7 +8,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.github.jefferyeven.jwt_authority.bean.JwtSecurityTokenSetting;
+import io.github.jefferyeven.jwt_authority.exception.JwtResponseMag;
+import io.github.jefferyeven.jwt_authority.exception.JwtSecurityException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 
@@ -19,11 +23,13 @@ public class JwtSecurityTokenUtil implements TokenVerifyer {
     private static String isser = "jwt_security";
     private static String tokenSecret = "token123";;  //密钥盐
     private static JWTVerifier verifier;
+    private static String tokenName ="jwt_token";
     public static void updateJwtSecurityTokenUtil(JwtSecurityTokenSetting jwtSecurityTokenSetting){
         expireTime = jwtSecurityTokenSetting.getExpireTime();
         tokenSecret = jwtSecurityTokenSetting.getTokenSecret();
         isser = jwtSecurityTokenSetting.getIsser();
         verifier = JWT.require(Algorithm.HMAC256(tokenSecret)).withIssuer(isser).build();
+        tokenName = jwtSecurityTokenSetting.getTokenHeaderName();
     }
 
     /**
@@ -51,8 +57,12 @@ public class JwtSecurityTokenUtil implements TokenVerifyer {
 
 
     @Override
-    public VerifyTokenResult verifyToken(String token) {
+    public VerifyTokenResult verifyToken(HttpServletRequest request, HttpServletResponse response) {
         VerifyTokenResult verifyTokenResult = new VerifyTokenResult();
+        String token = request.getHeader(tokenName);
+        if(token==null){
+            throw new JwtSecurityException(JwtResponseMag.NoTokenError);
+        }
         try {
             DecodedJWT jwt = verifier.verify(token);
             verifyTokenResult.setPassVerify(true);

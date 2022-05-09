@@ -11,6 +11,8 @@ public class JwtSecurityTokenSetting {
     private String isser;
     @Value("${jwt_token.token_secret:token123}")
     private String tokenSecret;
+    @Value("${jwt_token.token_header_name:token}")
+    private String tokenHeaderName;
 
     public long getExpireTime() {
         return expireTime;
@@ -34,5 +36,13 @@ public class JwtSecurityTokenSetting {
 
     public void setTokenSecret(String tokenSecret) {
         this.tokenSecret = tokenSecret;
+    }
+
+    public String getTokenHeaderName() {
+        return tokenHeaderName;
+    }
+
+    public void setTokenHeaderName(String tokenHeaderName) {
+        this.tokenHeaderName = tokenHeaderName;
     }
 }
