@@ -15,7 +15,6 @@ public class HttpConfig {
         urlsPermissionList = new ArrayList<>();
     }
     public void initConfig(){
-        System.out.println(AuthenizationStrategyManger.getStrategyTokenVerifyer());
         defaultUrlConfig = addConfigUrlsPermission("/*");
         defaultUrlConfig.haveToken();
         urlsPermissionList.add(defaultUrlConfig);

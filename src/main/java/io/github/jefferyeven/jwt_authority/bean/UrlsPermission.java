@@ -28,7 +28,6 @@ public class UrlsPermission {
 
     public void anonymous(){
         this.permissionLevel = PermissionLevel.HAVE_TOKEN;
-        System.out.println(AuthenizationStrategyManger.getStrategyTokenVerifyer());
         setAuthenizationStrategy(AuthenizationStrategyManger.getAuthentizationStrategyHaveToken());
     }
 
