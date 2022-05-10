@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.github.jefferyeven</groupId>
     <artifactId>jwt_authority</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
     <name>jwt_authority</name>
     <description>jwt_authority</description>
     <properties>
@@ -55,6 +55,7 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <excludes>/jwt_authority_simple/**</excludes>
                 </configuration>
             </plugin>
 
