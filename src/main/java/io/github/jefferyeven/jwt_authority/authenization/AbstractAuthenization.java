@@ -19,14 +19,16 @@ public abstract class AbstractAuthenization {
 
 
         AuthenizationState passAuthenization = passAuthenizate(request,response);
-        if(passAuthenization==AuthenizationState.PassState){
-            return true;
+        if(passAuthenization!=AuthenizationState.UnAuthenizateState){
+           if(passAuthenization==AuthenizationState.PassState){
+               return true;
+           }
+           if(passAuthenization==AuthenizationState.NoPassState){
+               return false;
+           }
         }
         if(nextAuthenizate==null){
-            if(passAuthenization==AuthenizationState.UnAuthenizateState){
-                throw new JwtSecurityException(JwtResponseMag.NoFindAuthenizationUrl);
-            }
-            return false;
+            throw new JwtSecurityException(JwtResponseMag.NoFindAuthenizationUrl);
         }
         return nextAuthenizate.doAuthenizate(request,response);
     }

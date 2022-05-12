@@ -20,10 +20,18 @@
 - 将 验证器 验证策略 鉴权器 都抽象出来便于灵活替换。
 
 # 使用方式
+## 引入maven
+```xml
+<dependency>
+    <groupId>io.github.jefferyeven</groupId>
+    <artifactId>jwt_authority</artifactId>
+</dependency>
+```
 
 ## 1. 最简单
-例子：
+例子：https://github.com/jefferyeven/jwt_authority/tree/master/jwt_authority_simple/SimpleUse
 ### 1.1 设置jwt的一些配置
+在application.properties上添加该项。
 ```properties
 #token的过期时间
 jwt_token.expire_time = 10000000
@@ -56,4 +64,150 @@ public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
 ```
 ## 2. 推荐
 
+### 2.1 实现TokenVerifyer(自定义jwt token)
+我们可以从header/session/cookie/requset读取token的值，然后验证url所需要的权限和自己有的权限，
+具体的实现可以看下方的代码。
+```java
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import io.github.jefferyeven.jwt_authority.exception.JwtResponseMag;
+import io.github.jefferyeven.jwt_authority.exception.JwtSecurityException;
+import io.github.jefferyeven.jwt_authority.utils.TokenVerifyer;
+import io.github.jefferyeven.jwt_authority.utils.VerifyTokenResult;
+import org.springframework.boot.web.servlet.server.Session;
+import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.Date;
+import java.util.List;
+@Component
+public class TokenUtil implements TokenVerifyer {
+    public String salt = "fdelsfjdo.243";
+    public long expireTime = 100000000;
+    String isser = "test";
+    private final JWTVerifier verifier = JWT.require(Algorithm.HMAC256(salt)).withIssuer(isser).build();
+    @Override
+    public VerifyTokenResult verifyToken(HttpServletRequest request, HttpServletResponse response) {
+        VerifyTokenResult verifyTokenResult = new VerifyTokenResult();
+        // 从head读取token
+        String tokenName = "token";
+        String token = request.getHeader(tokenName);
+//        // 从session读取token
+//        HttpSession httpSession = request.getSession();
+//        token = (String) httpSession.getAttribute(tokenName);
+//        // 从cookie读取token
+//        Cookie[] cookies = request.getCookies();
+//        for(Cookie cookie:cookies){
+//            System.out.println(cookie.getName());
+//            if(cookie.getName().equals(tokenName)){
+//                token = cookie.getValue();
+//                System.out.println(token);
+//                break;
+//            }
+//        }
+//        // 从request读取token
+//        token = request.getHeader(tokenName);
+
+        if(token==null){
+            throw new JwtSecurityException(JwtResponseMag.NoTokenError);
+        }
+        try {
+            DecodedJWT jwt = verifier.verify(token);
+            verifyTokenResult.setPassVerify(true);
+            Claim authoritiesClaim =  jwt.getClaims().get("authorities");
+            if(authoritiesClaim==null){
+                return verifyTokenResult;
+            }
+            List<String> authorities = JSONObject.parseArray(authoritiesClaim.asString(),String.class);
+            verifyTokenResult.setAuthorities(authorities);
+        } catch (Exception e){
+            verifyTokenResult.setPassVerify(false);
+        }
+        return verifyTokenResult;
+    }
+    public String sign(String userid, String name, List<String> authorities){
+        String token = null;
+        try {
+            Date expiresAt = new Date(System.currentTimeMillis() + expireTime);
+            token = JWT.create()
+                    .withIssuer(isser)
+                    .withClaim("userid",userid)
+                    .withClaim("username", name)
+                    .withClaim("authorities", JSON.toJSONString(authorities))
+                    .withExpiresAt(expiresAt)
+                    // 使用了HMAC256加密算法。
+                    .sign(Algorithm.HMAC256(salt));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return token;
+    }
+}
+
+```
+在配置类 设置verifyer
+```
+    @Override
+    public void config(AuthenizationConfig authenizationConfig){
+        authenizationConfig.setStrategyTokenVerifyer(new TokenUtil());
+    }
+```
+### 2.2开启注解
+1. 在安全配置类开启使用注解
+```
+    @Override
+    public void config(AuthenizationConfig authenizationConfig){
+        // 开启注解
+        authenizationConfig.setUseAnnoation(true);
+    }
+```
+2.可以修饰类和修饰方法上(只支持加在controller)
+```
+@RestController
+@RequestMapping("/user")
+@NeedAuthorize(authorizeLevel = PermissionLevel.HAVE_ANY_AUTHORITY,authorties = {"admin"})
+public class UserController {
+    @RequestMapping("/hello")
+    public String hello(){
+        return "user hello";
+    }
+    @RequestMapping("needAdmin")
+    @NeedAuthorize(authorizeLevel = PermissionLevel.HAVE_ANY_AUTHORITY,authorties = {"admin"})
+    public String needAdmin(){
+        return "need admin";
+    }
+}
+```
+### 2.3 设置配置类
+```java
+@Configuration
+public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
+
+    @Override
+    public void config(HttpConfig httpConfig) {
+        httpConfig.addConfigUrlsPermission("/admin/*").haveAnyAuthority("admin");
+        httpConfig.addConfigUrlsPermission("/user/*").haveAnyAuthority("user","admin");
+        httpConfig.addConfigUrlsPermission("index/*").permitAll();
+        // 如果没有设置我们就默认允许
+        httpConfig.getDefaultUrlConfig().permitAll();
+    }
+
+    @Override
+    public void config(AuthenizationConfig authenizationConfig){
+        authenizationConfig.setStrategyTokenVerifyer(new TokenUtil());
+        // 开启注解
+        authenizationConfig.setUseAnnoation(true);
+    }
+
+}
+```
+## 3. 进阶使用
+自定义失败处理器，自定义验证策略，自定义动态的权限认证

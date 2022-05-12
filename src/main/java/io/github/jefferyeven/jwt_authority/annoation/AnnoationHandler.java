@@ -52,7 +52,7 @@ public class AnnoationHandler implements EmbeddedValueResolverAware {
             cleanMappingValues(prePerifx);
             if(readClass.isAnnotationPresent(NeedAuthorize.class)){
                 NeedAuthorize needAuthorize = readClass.getAnnotation(NeedAuthorize.class);
-                Map<String, UrlPermission> map = annoationPermissionUrl.getGetMap();
+                Map<String, UrlPermission> map = annoationPermissionUrl.getRequestMap();
                 PermissionLevel permissionLevel = needAuthorize.authorizeLevel();
                 List<String> authorities = Arrays.asList(needAuthorize.authorties());
                 AuthentizationStrategy strategy = AuthenizationStrategyManger.getAuthenizationByPermissionLevel(permissionLevel);

@@ -44,6 +44,7 @@ public class AnnoationAuthenization extends AbstractAuthenization {
         }
         // 代表是reques,由于其可以是加在类上。
         String findUrl = findMathUrl(url,map);
+        System.out.println(findUrl);
         // 没有发现匹配的url
         if (noMatch.equals(findUrl)) {
             return AuthenizationState.UnAuthenizateState;
@@ -62,6 +63,7 @@ public class AnnoationAuthenization extends AbstractAuthenization {
                 res.append(mathes[j]).append("/");
             }
             res.append("*");
+            System.out.println(res);
             if (map.containsKey(res.toString())) {
                 return res.toString();
             }
