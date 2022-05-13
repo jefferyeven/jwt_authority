@@ -1,6 +1,6 @@
 package io.github.jefferyeven.jwt_authority.filter;
 
-import io.github.jefferyeven.jwt_authority.authenization.AbstractAuthenization;
+import io.github.jefferyeven.jwt_authority.authorization.AbstractAuthorization;
 import io.github.jefferyeven.jwt_authority.exception.JwtResponseMag;
 import io.github.jefferyeven.jwt_authority.exception.JwtSecurityException;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class JwtUrlsPermissionFilter implements Filter {
 
-   private AbstractAuthenization startAuthenization;
+   private AbstractAuthorization startAuthorization;
     public JwtUrlsPermissionFilter(){
 
     }
@@ -33,12 +33,12 @@ public class JwtUrlsPermissionFilter implements Filter {
     public void setJwtUrlsPermissionFailureHandler(JwtUrlsPermissionFailureHandler jwtUrlsPermissionFailureHandler) {
         this.jwtUrlsPermissionFailureHandler = jwtUrlsPermissionFailureHandler;
     }
-    public AbstractAuthenization getStartAuthenization() {
-        return startAuthenization;
+    public AbstractAuthorization getStartAuthorization() {
+        return startAuthorization;
     }
 
-    public void setStartAuthenization(AbstractAuthenization startAuthenization) {
-        this.startAuthenization = startAuthenization;
+    public void setStartAuthorization(AbstractAuthorization startAuthorization) {
+        this.startAuthorization = startAuthorization;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class JwtUrlsPermissionFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         boolean passAuthenizate;
         try {
-            passAuthenizate = startAuthenization.doAuthenizate(request,response);
+            passAuthenizate = startAuthorization.doAuthenizate(request,response);
         } catch (Exception e) {
             throwExceptionUrl(request,response,e);
             return;

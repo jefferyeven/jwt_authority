@@ -1,6 +1,6 @@
 package io.github.jefferyeven.jwt_authority.bean;
 
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthentizationStrategy;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategy;
 
 import java.util.List;
 
@@ -8,15 +8,15 @@ public class UrlPermission {
     private String url;
     private List<String> authorities;
     private PermissionLevel permissionLevel;
-    private AuthentizationStrategy authenizationStrategy;
+    private AuthorizationStrategy authorizationStrategy;
     public UrlPermission(){
     }
 
-    public UrlPermission(String url, List<String> authorities, PermissionLevel permissionLevel, AuthentizationStrategy authenizationStrategy) {
+    public UrlPermission(String url, List<String> authorities, PermissionLevel permissionLevel, AuthorizationStrategy authorizationStrategy) {
         this.url = url;
         this.authorities = authorities;
         this.permissionLevel = permissionLevel;
-        this.authenizationStrategy = authenizationStrategy;
+        this.authorizationStrategy = authorizationStrategy;
     }
 
     public String getUrl() {
@@ -43,11 +43,11 @@ public class UrlPermission {
         this.permissionLevel = permissionLevel;
     }
 
-    public AuthentizationStrategy getAuthenizationStrategy() {
-        return authenizationStrategy;
+    public AuthorizationStrategy getAuthorizationStrategy() {
+        return authorizationStrategy;
     }
 
-    public void setAuthenizationStrategy(AuthentizationStrategy authenizationStrategy) {
-        this.authenizationStrategy = authenizationStrategy;
+    public void setAuthorizationStrategy(AuthorizationStrategy authorizationStrategy) {
+        this.authorizationStrategy = authorizationStrategy;
     }
 }

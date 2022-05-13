@@ -1,7 +1,7 @@
-package io.github.jefferyeven.jwt_authority.authenization;
+package io.github.jefferyeven.jwt_authority.authorization;
 
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthentizationStrategy;
-import io.github.jefferyeven.jwt_authority.bean.AuthenizationState;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategy;
+import io.github.jefferyeven.jwt_authority.bean.AuthorizationState;
 import io.github.jefferyeven.jwt_authority.bean.UrlPermission;
 import io.github.jefferyeven.jwt_authority.bean.UrlsPermission;
 import io.github.jefferyeven.jwt_authority.utils.CommonUtils;
@@ -12,31 +12,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BasicAuthenization extends AbstractAuthenization{
+public class BasicAuthorization extends AbstractAuthorization{
     // 对urlPermission进行规范化
     private final Map<String, UrlPermission> urlPermissionMap = new HashMap<>();
     private final String noMatch = "don't find match url";
-    public BasicAuthenization(List<UrlsPermission> urlsPermissionList){
+    public BasicAuthorization(List<UrlsPermission> urlsPermissionList){
         for (UrlsPermission urlsPermission : urlsPermissionList) {
             for (String s : urlsPermission.getUrls()) {
                 s = CommonUtils.urlStandard(s);
-                UrlPermission urlPermission = new UrlPermission(s,urlsPermission.getAuthorities(),urlsPermission.getPermissionLevel(),urlsPermission.getAuthenizationStrategy());
+                UrlPermission urlPermission = new UrlPermission(s,urlsPermission.getAuthorities(),urlsPermission.getPermissionLevel(),urlsPermission.getAuthorizationStrategy());
                 urlPermissionMap.put(s, urlPermission);
             }
         }
     }
     @Override
-    public AuthenizationState passAuthenizate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public AuthorizationState passAuthenizate(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String findUrl = findMathUrl(request.getRequestURI());
         // 没有发现匹配的url
         if (noMatch.equals(findUrl)) {
-            return AuthenizationState.UnAuthenizateState;
+            return AuthorizationState.UnAuthenizateState;
         }
         UrlPermission urlPermission = urlPermissionMap.get(findUrl);
         // 得到鉴权的策略
-        AuthentizationStrategy authentizationStrategy = urlPermission.getAuthenizationStrategy();
-        boolean passAuthentization = authentizationStrategy.passAuthentization(request,response,urlPermission);
-        return  passAuthentization?AuthenizationState.PassState:AuthenizationState.NoPassState;
+        AuthorizationStrategy authorizationStrategy = urlPermission.getAuthorizationStrategy();
+        boolean passAuthorization = authorizationStrategy.passAuthorization(request,response,urlPermission);
+        return  passAuthorization?AuthorizationState.PassState:AuthorizationState.NoPassState;
     }
 
     private String findMathUrl(String url) {

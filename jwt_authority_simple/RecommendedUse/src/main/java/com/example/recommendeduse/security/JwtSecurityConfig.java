@@ -1,6 +1,6 @@
 package com.example.recommendeduse.security;
 
-import io.github.jefferyeven.jwt_authority.config.AuthenizationConfig;
+import io.github.jefferyeven.jwt_authority.config.AuthorizationConfig;
 import io.github.jefferyeven.jwt_authority.config.HttpConfig;
 import io.github.jefferyeven.jwt_authority.config.JwtSecurityConfigAdapter;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +18,10 @@ public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
     }
 
     @Override
-    public void config(AuthenizationConfig authenizationConfig){
-        authenizationConfig.setStrategyTokenVerifyer(new TokenUtil());
+    public void config(AuthorizationConfig authorizationConfig){
+        authorizationConfig.setStrategyTokenVerifyer(new TokenUtil());
         // 开启注解
-        authenizationConfig.setUseAnnoation(true);
+        authorizationConfig.setUseAnnoation(true);
     }
 
 }

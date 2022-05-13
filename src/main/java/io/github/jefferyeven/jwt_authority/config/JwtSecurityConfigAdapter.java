@@ -1,10 +1,10 @@
 package io.github.jefferyeven.jwt_authority.config;
 
 import io.github.jefferyeven.jwt_authority.annoation.AnnoationHandler;
-import io.github.jefferyeven.jwt_authority.authenization.AnnoationAuthenization;
-import io.github.jefferyeven.jwt_authority.authenization.AuthenizationOrder;
-import io.github.jefferyeven.jwt_authority.authenization.BasicAuthenization;
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
+import io.github.jefferyeven.jwt_authority.authorization.AnnoationAuthorization;
+import io.github.jefferyeven.jwt_authority.authorization.AuthorizationOrder;
+import io.github.jefferyeven.jwt_authority.authorization.BasicAuthorization;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategyManger;
 import io.github.jefferyeven.jwt_authority.bean.JwtSecurityTokenSetting;
 import io.github.jefferyeven.jwt_authority.utils.JwtSecurityTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,11 @@ import javax.annotation.PostConstruct;
 @ComponentScan(value = "io.github.jefferyeven.jwt_authority")
 public abstract class JwtSecurityConfigAdapter {
     private final HttpConfig httpConfig;
-    private final AuthenizationConfig authenizationConfig;
+    private final AuthorizationConfig authenicationConfig;
     @Autowired
     private JwtSecurityTokenSetting jwtSecurityTokenSetting;
     public JwtSecurityConfigAdapter(){
-       authenizationConfig = new AuthenizationConfig();
+       authenicationConfig = new AuthorizationConfig();
         httpConfig = new HttpConfig();
     }
 
@@ -35,38 +35,38 @@ public abstract class JwtSecurityConfigAdapter {
 
     /**
      * 配置验证逻辑
-     * @param authenizationConfig 配置验证逻辑
+     * @param authenicationConfig 配置验证逻辑
      */
-    public void config(AuthenizationConfig authenizationConfig){
+    public void config(AuthorizationConfig authenicationConfig){
     }
     @Autowired
     private AnnoationHandler annoationHandler;
 
-    public void initAuthenization(){
-        if(authenizationConfig.getUseAnnoation()){
+    public void initAuthorization(){
+        if(authenicationConfig.getUseAnnoation()){
             annoationHandler.readAnnoation();
-            AnnoationAuthenization annoationAuthenization = new AnnoationAuthenization(annoationHandler.getAnnoationPermissionUrl());
-            AuthenizationOrder authenizationOrder = new AuthenizationOrder(annoationAuthenization,900);
-            authenizationConfig.addAuthenization(authenizationOrder);
+            AnnoationAuthorization annoationAuthorization = new AnnoationAuthorization(annoationHandler.getAnnoationPermissionUrl());
+            AuthorizationOrder authenicationOrder = new AuthorizationOrder(annoationAuthorization,900);
+            authenicationConfig.addAuthorization(authenicationOrder);
         }
-        BasicAuthenization basicAuthenization = new BasicAuthenization(httpConfig.getUrlsPermissionList());
-        authenizationConfig.addAuthenization(new AuthenizationOrder(basicAuthenization, 1000));
+        BasicAuthorization basicAuthorization = new BasicAuthorization(httpConfig.getUrlsPermissionList());
+        authenicationConfig.addAuthorization(new AuthorizationOrder(basicAuthorization, 1000));
     }
 
     public HttpConfig getHttpConfig() {
         return httpConfig;
     }
 
-    public AuthenizationConfig getAuthenizationConfig() {
-        return authenizationConfig;
+    public AuthorizationConfig getAuthorizationConfig() {
+        return authenicationConfig;
     }
 
     @Bean
     public FilterRegistrationBean registrationBean() throws Exception {
         // 设置验证filter
-        initAuthenization();
+        initAuthorization();
         FilterRegistrationBean registration = new FilterRegistrationBean();
-        registration.setFilter(authenizationConfig.getJwtUrlsPermissionFilter());
+        registration.setFilter(authenicationConfig.getJwtUrlsPermissionFilter());
         registration.addUrlPatterns("/*");
         registration.setName("JWTFilter");
         return registration;
@@ -76,9 +76,9 @@ public abstract class JwtSecurityConfigAdapter {
     private void postConfig(){
         JwtSecurityTokenUtil.updateJwtSecurityTokenUtil(jwtSecurityTokenSetting);
         //设置默认的token verifyer
-        AuthenizationStrategyManger.setStrategyTokenVerifyer(new JwtSecurityTokenUtil());
+        AuthorizationStrategyManger.setStrategyTokenVerifyer(new JwtSecurityTokenUtil());
         // 先构建认证的相关配置
-        config(authenizationConfig);
+        config(authenicationConfig);
         // 根据验证规则初始化
         httpConfig.initConfig();
         // 再构建需要认证的url

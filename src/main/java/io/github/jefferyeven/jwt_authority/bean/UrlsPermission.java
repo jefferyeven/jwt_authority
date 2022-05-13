@@ -1,7 +1,7 @@
 package io.github.jefferyeven.jwt_authority.bean;
 
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthentizationStrategy;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategyManger;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +12,7 @@ public class UrlsPermission {
     private final List<String> urls;
     private List<String> authorities;
     private PermissionLevel permissionLevel;
-    private AuthentizationStrategy authenizationStrategy;
+    private AuthorizationStrategy authorizationStrategy;
 
     public UrlsPermission(){
         urls = new ArrayList<>();
@@ -28,34 +28,34 @@ public class UrlsPermission {
 
     public void anonymous(){
         this.permissionLevel = PermissionLevel.HAVE_TOKEN;
-        setAuthenizationStrategy(AuthenizationStrategyManger.getAuthentizationStrategyHaveToken());
+        setAuthorizationStrategy(AuthorizationStrategyManger.getAuthorizationStrategyHaveToken());
     }
 
     public void permitAll(){
         this.permissionLevel = PermissionLevel.PERMISSION_All;
-        setAuthenizationStrategy(AuthenizationStrategyManger.getAuthentizationStrategyPermissionAll());
+        setAuthorizationStrategy(AuthorizationStrategyManger.getAuthorizationStrategyPermissionAll());
     }
     public void denyAll(){
         this.permissionLevel = PermissionLevel.DENY_All;
-        setAuthenizationStrategy(AuthenizationStrategyManger.getAuthentizationStrategyDenyAll());
+        setAuthorizationStrategy(AuthorizationStrategyManger.getAuthorizationStrategyDenyAll());
     }
     public void haveToken(){
         this.permissionLevel = PermissionLevel.HAVE_TOKEN;
-        setAuthenizationStrategy(AuthenizationStrategyManger.getAuthentizationStrategyHaveToken());
+        setAuthorizationStrategy(AuthorizationStrategyManger.getAuthorizationStrategyHaveToken());
     }
     public void haveAnyAuthority(String ... authorities){
         this.permissionLevel = PermissionLevel.HAVE_ANY_AUTHORITY;
         this.authorities = new ArrayList<>(Arrays.asList(authorities));
-        setAuthenizationStrategy(AuthenizationStrategyManger.getAuthenizationStrategyHaveAnyAuthority());
+        setAuthorizationStrategy(AuthorizationStrategyManger.getAuthorizationStrategyHaveAnyAuthority());
     }
 
     public void haveAllAuthority(String ... authorities){
         this.permissionLevel = PermissionLevel.HAVE_ALL_AUTHORITY;
         this.authorities = new ArrayList<>(Arrays.asList(authorities));
-        setAuthenizationStrategy(AuthenizationStrategyManger.getAuthenizationStrategyHaveAllAuthority());
+        setAuthorizationStrategy(AuthorizationStrategyManger.getAuthorizationStrategyHaveAllAuthority());
     }
-    public void setAuthenizationStrategy (AuthentizationStrategy authenizationStrategy){
-        this.authenizationStrategy = authenizationStrategy;
+    public void setAuthorizationStrategy (AuthorizationStrategy authorizationStrategy){
+        this.authorizationStrategy = authorizationStrategy;
     }
 
     public List<String> getUrls() {
@@ -70,7 +70,7 @@ public class UrlsPermission {
         return permissionLevel;
     }
 
-    public AuthentizationStrategy getAuthenizationStrategy() {
-        return authenizationStrategy;
+    public AuthorizationStrategy getAuthorizationStrategy() {
+        return authorizationStrategy;
     }
 }

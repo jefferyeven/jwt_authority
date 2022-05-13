@@ -1,7 +1,7 @@
 package io.github.jefferyeven.jwt_authority.annoation;
 
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthentizationStrategy;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategyManger;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategy;
 import io.github.jefferyeven.jwt_authority.bean.AnnoationPermissionUrl;
 import io.github.jefferyeven.jwt_authority.bean.PermissionLevel;
 import io.github.jefferyeven.jwt_authority.bean.UrlPermission;
@@ -55,7 +55,7 @@ public class AnnoationHandler implements EmbeddedValueResolverAware {
                 Map<String, UrlPermission> map = annoationPermissionUrl.getRequestMap();
                 PermissionLevel permissionLevel = needAuthorize.authorizeLevel();
                 List<String> authorities = Arrays.asList(needAuthorize.authorties());
-                AuthentizationStrategy strategy = AuthenizationStrategyManger.getAuthenizationByPermissionLevel(permissionLevel);
+                AuthorizationStrategy strategy = AuthorizationStrategyManger.getAuthorizationByPermissionLevel(permissionLevel);
                 for(String url : prePerifx){
                     url = url + "/*";
                     map.put(url,new UrlPermission(url,authorities,permissionLevel,strategy));
@@ -117,7 +117,7 @@ public class AnnoationHandler implements EmbeddedValueResolverAware {
 
         PermissionLevel permissionLevel = needAuthorize.authorizeLevel();
         List<String> authorities = Arrays.asList(needAuthorize.authorties());
-        AuthentizationStrategy strategy = AuthenizationStrategyManger.getAuthenizationByPermissionLevel(permissionLevel);
+        AuthorizationStrategy strategy = AuthorizationStrategyManger.getAuthorizationByPermissionLevel(permissionLevel);
         cleanMappingValues(values);
         for(String preValueItem:preValues){
             for(String valueItem:values){

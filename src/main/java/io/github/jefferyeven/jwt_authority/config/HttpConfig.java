@@ -1,6 +1,6 @@
 package io.github.jefferyeven.jwt_authority.config;
 
-import io.github.jefferyeven.jwt_authority.authentization_strategy.AuthenizationStrategyManger;
+import io.github.jefferyeven.jwt_authority.authorization_strategy.AuthorizationStrategyManger;
 import io.github.jefferyeven.jwt_authority.bean.UrlsPermission;
 
 import java.util.ArrayList;
@@ -59,6 +59,6 @@ public class HttpConfig {
     }
 
     public void setHeaderParameterTokenName(String headerParameterTokenName) {
-        AuthenizationStrategyManger.setHeaderParameterTokenName(headerParameterTokenName);
+        AuthorizationStrategyManger.setHeaderParameterTokenName(headerParameterTokenName);
     }
 }

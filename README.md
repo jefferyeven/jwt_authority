@@ -2,7 +2,7 @@
 
 # 前言
 这个项目是面向jwt的，所以不需要进行登录验证。
-这个项目是从https://gitee.com/jefferyeven/jwt-authenization 抽离出来的，
+这个项目是从https://gitee.com/jefferyeven/jwt-authorization 抽离出来的，
 如果想看详细的开发与设计思路可以看一下上面的项目链接。下面我将介绍一些他的的些特性和使用教程。
 # 原理
 原理其实是非常简单，主要是通过过滤器进行鉴权，把没有通过权限认证的请求拦截下来，
@@ -156,17 +156,17 @@ public class TokenUtil implements TokenVerifyer {
 在配置类 设置verifyer
 ```
     @Override
-    public void config(AuthenizationConfig authenizationConfig){
-        authenizationConfig.setStrategyTokenVerifyer(new TokenUtil());
+    public void config(AuthenizationConfig authorizationConfig){
+        authorizationConfig.setStrategyTokenVerifyer(new TokenUtil());
     }
 ```
 ### 2.2开启注解
 1. 在安全配置类开启使用注解
 ```
     @Override
-    public void config(AuthenizationConfig authenizationConfig){
+    public void config(AuthenizationConfig authorizationConfig){
         // 开启注解
-        authenizationConfig.setUseAnnoation(true);
+        authorizationConfig.setUseAnnoation(true);
     }
 ```
 2.可以修饰类和修饰方法上(只支持加在controller)
@@ -201,13 +201,113 @@ public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
     }
 
     @Override
-    public void config(AuthenizationConfig authenizationConfig){
-        authenizationConfig.setStrategyTokenVerifyer(new TokenUtil());
+    public void config(AuthenizationConfig authorizationConfig){
+        authorizationConfig.setStrategyTokenVerifyer(new TokenUtil());
         // 开启注解
-        authenizationConfig.setUseAnnoation(true);
+        authorizationConfig.setUseAnnoation(true);
     }
 
 }
 ```
 ## 3. 进阶使用
 自定义失败处理器，自定义验证策略，自定义动态的权限认证
+1. 实现JwtUrlsPermissionFailureHandler接口
+### 自定义失败处理器
+```java
+public class UrlFailureHandler implements JwtUrlsPermissionFailureHandler {
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, Exception e) throws ServletException, IOException {
+        System.out.println("出现了错误");
+        e.printStackTrace();
+        request.setAttribute("exception",e);
+        // 跳转到处理错误的页面
+        request.getRequestDispatcher("/index/error").forward(request,response);
+    }
+}
+```
+2. 修改配置类
+   authorizationConfig.setJwtUrlsPermissionFailureHandler(new UrlFailureHandler());
+### 自定义验证策略
+1. 实现authorizationStrategy接口
+```java
+@Component
+public class NewAuthorizationStrategy implements authorizationStrategy {
+    @Autowired
+    TokenUtil tokenUtil;
+    @Override
+    public boolean passauthorization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission) throws Exception {
+        // 从header读取token
+        VerifyTokenResult verifyTokenResult = tokenUtil.verifyToken(request,response);
+        if(!verifyTokenResult.isPassVerify()){
+            return false;
+        }
+        // 这里的验证规则是有admin就直接通过
+        return verifyTokenResult.getAuthorities().contains("vip");
+    }
+}
+```
+2. 修改配置类
+   httpConfig.addConfigUrlsPermission("home/*").setAuthenizationStrategy(newAuthorizationStrategy);
+### 自定义动态权限认证
+1. 继承AbstractAuthenization
+```java
+@Component
+public class DynamicAuthorization extends AbstractAuthenization {
+    @Autowired
+    UrlAuthoritiesMapper urlAuthoritiesMapper;
+    @Autowired
+    TokenUtil tokenUtil;
+    @Override
+    public AuthenizationState passAuthenizate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        System.out.println(request.getRequestURI());
+        UrlAuthorities urlAuthorities = urlAuthoritiesMapper.getUrlAuthoritiesFromUrl(request.getRequestURI());
+        if(urlAuthorities==null){
+            return AuthenizationState.UnAuthenizateState;
+        }
+        VerifyTokenResult verifyTokenResult = tokenUtil.verifyToken(request,response);
+        if(!verifyTokenResult.isPassVerify()){
+            throw new JwtSecurityException(JwtResponseMag.TokenError);
+        }
+        List<String> authortities = JSON.parseObject(urlAuthorities.getAuthorities(),List.class);
+        for(String s:authortities){
+            if(verifyTokenResult.getAuthorities().contains(s)){
+                return AuthenizationState.PassState;
+            }
+        }
+        return AuthenizationState.UnAuthenizateState;
+    }
+}
+```
+2. 修改配置类
+   authorizationConfig.addAuthenization(dynamicAuthorization,1);
+### 总的鉴权器配置
+```java
+@Configuration
+public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
+    @Autowired
+    DynamicAuthorization dynamicAuthorization;
+    @Autowired
+    NewAuthorizationStrategy newAuthorizationStrategy;
+    @Override
+    public void config(HttpConfig httpConfig) {
+        httpConfig.addConfigUrlsPermission("/admin/*").haveAnyAuthority("admin");
+        httpConfig.addConfigUrlsPermission("/user/*").haveAnyAuthority("user","admin");
+        httpConfig.addConfigUrlsPermission("index/*").permitAll();
+        httpConfig.addConfigUrlsPermission("home/*").setAuthenizationStrategy(newAuthorizationStrategy);
+        // 如果没有设置我们就默认允许
+        httpConfig.getDefaultUrlConfig().permitAll();
+    }
+
+    @Override
+    public void config(AuthenizationConfig authorizationConfig){
+        authorizationConfig.setStrategyTokenVerifyer(new TokenUtil());
+        // 开启注解
+        authorizationConfig.setUseAnnoation(true);
+        // 设置失败处理器
+        authorizationConfig.setJwtUrlsPermissionFailureHandler(new UrlFailureHandler());
+        // 设置自定义的鉴权器
+        authorizationConfig.addAuthenization(dynamicAuthorization,1);
+    }
+
+}
+```

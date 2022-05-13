@@ -1,4 +1,4 @@
-package io.github.jefferyeven.jwt_authority.authentization_strategy;
+package io.github.jefferyeven.jwt_authority.authorization_strategy;
 
 import io.github.jefferyeven.jwt_authority.bean.UrlPermission;
 import io.github.jefferyeven.jwt_authority.exception.JwtResponseMag;
@@ -8,9 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-public class AuthentizationStrategyDenyAll implements AuthentizationStrategy{
+public class AuthorizationStrategyDenyAll implements AuthorizationStrategy{
     @Override
-    public boolean passAuthentization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission){
+    public boolean passAuthorization(HttpServletRequest request, HttpServletResponse response, UrlPermission urlPermission){
         throw new JwtSecurityException(JwtResponseMag.DenyRequestError);
     }
 }
