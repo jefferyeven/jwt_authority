@@ -25,6 +25,7 @@
 <dependency>
     <groupId>io.github.jefferyeven</groupId>
     <artifactId>jwt_authority</artifactId>
+   <version>${最新版本}</version>
 </dependency>
 ```
 
