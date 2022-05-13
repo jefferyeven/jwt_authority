@@ -64,7 +64,7 @@ public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
 }
 ```
 ## 2. 推荐
-
+例子：https://github.com/jefferyeven/jwt_authority/tree/master/jwt_authority_simple/RecommendedUse
 ### 2.1 实现TokenVerifyer(自定义jwt token)
 我们可以从header/session/cookie/requset读取token的值，然后验证url所需要的权限和自己有的权限，
 具体的实现可以看下方的代码。
@@ -211,6 +211,7 @@ public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
 }
 ```
 ## 3. 进阶使用
+例子：https://github.com/jefferyeven/jwt_authority/tree/master/jwt_authority_simple/advanceUse
 自定义失败处理器，自定义验证策略，自定义动态的权限认证
 1. 实现JwtUrlsPermissionFailureHandler接口
 ### 自定义失败处理器
