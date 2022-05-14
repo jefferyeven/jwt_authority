@@ -25,7 +25,7 @@
 <dependency>
     <groupId>io.github.jefferyeven</groupId>
     <artifactId>jwt_authority</artifactId>
-   <version>${最新版本}</version>
+   <version>1.1.0</version>
 </dependency>
 ```
 
@@ -62,6 +62,16 @@ public class JwtSecurityConfig extends JwtSecurityConfigAdapter {
         httpConfig.getDefaultUrlConfig().permitAll();
     }
 }
+```
+### 1.3 发布token
+需要用户名，和该用户名所持有的权限就可以发布token
+```
+ @RequestMapping("loginAdmin")
+    public String loginAdmin(){
+        List<String> authority = new ArrayList<>();
+        authority.add("admin");
+        return JwtSecurityTokenUtil.sign("adminTest",authority);
+    }
 ```
 ## 2. 推荐
 例子：https://github.com/jefferyeven/jwt_authority/tree/master/jwt_authority_simple/RecommendedUse
